@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Sparkles, RefreshCw, Eye, Share2, ArrowRight, AlertTriangle, Check, Info, Lock, Sun, Moon, GitBranch, FileText, Calendar, BarChart3, LayoutDashboard } from 'lucide-react';
+import { Sparkles, RefreshCw, Eye, Share2, ArrowRight, AlertTriangle, Check, Info, GitBranch, FileText, Calendar, BarChart3, LayoutDashboard } from 'lucide-react';
 
 // API & Utilities
 import { fetchRepoData, fetchLatestRelease } from './api/github';
@@ -44,17 +44,13 @@ export default function App() {
   const [baseData, setBaseData] = useState(null);
   const [compareData, setCompareData] = useState(null);
 
-  // State: Settings & API Keys
-  const [showSettings, setShowSettings] = useState(false);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('anthropic_api_key') || '');
-  const [customEndpoint, setCustomEndpoint] = useState(() => localStorage.getItem('anthropic_custom_endpoint') || '');
-  const [githubPat, setGithubPat] = useState(() => localStorage.getItem('github_pat') || '');
+  // API Keys & Credentials loaded from environment variables (.env)
+  const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY || '';
+  const customEndpoint = import.meta.env.VITE_CUSTOM_ENDPOINT || '';
+  const githubPat = import.meta.env.VITE_GITHUB_PAT || '';
 
-  // State: Theme
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    const saved = localStorage.getItem('goat_notes_theme');
-    return saved ? saved === 'dark' : true;
-  });
+  // Theme: Constant dark mode
+
 
   // State: Loaders & Errors
   const [isLoading, setIsLoading] = useState(false);
@@ -64,17 +60,11 @@ export default function App() {
   const [isSharedView, setIsSharedView] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
 
-  // Apply theme class to document body (fixes light mode background!)
+  // Apply theme class to document body
   useEffect(() => {
-    const body = window.document.body;
-    if (isDarkMode) {
-      body.classList.add('dark');
-      localStorage.setItem('goat_notes_theme', 'dark');
-    } else {
-      body.classList.remove('dark');
-      localStorage.setItem('goat_notes_theme', 'light');
-    }
-  }, [isDarkMode]);
+    window.document.body.classList.add('dark');
+    localStorage.setItem('goat_notes_theme', 'dark');
+  }, []);
 
   // Load shared URL hash state on mount
   useEffect(() => {
@@ -113,14 +103,7 @@ export default function App() {
     }
   }, []);
 
-  // Save Settings
-  const handleSaveSettings = (e) => {
-    e.preventDefault();
-    localStorage.setItem('anthropic_api_key', apiKey.trim());
-    localStorage.setItem('anthropic_custom_endpoint', customEndpoint.trim());
-    localStorage.setItem('github_pat', githubPat.trim());
-    setShowSettings(false);
-  };
+
 
   // Workflow: Full Release Notes Generation
   const handleGenerate = async ({ owner: o, repo: r, since: s, until: u }) => {
@@ -137,9 +120,8 @@ export default function App() {
     updateUrlHash(null);
 
     if (!apiKey) {
-      setError('An API Key is required to generate release notes. Please click the Settings gear in the top right to configure Groq or Claude.');
+      setError('An API Key is required to generate release notes. Please configure the VITE_ANTHROPIC_API_KEY environment variable in your .env file.');
       setIsLoading(false);
-      setShowSettings(true);
       return;
     }
 
@@ -389,22 +371,7 @@ export default function App() {
 
             {/* Right Header Navigation */}
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className="p-2 rounded-xl dark:bg-slate-950/40 bg-white/45 hover:bg-slate-200/50 dark:hover:bg-slate-900/60 border border-slate-200 dark:border-slate-850 dark:text-amber-500/90 text-amber-600 transition-all cursor-pointer shadow-sm"
-                title={isDarkMode ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
-              >
-                {isDarkMode ? <Sun size={15} /> : <Moon size={15} />}
-              </button>
-
-              <button
-                onClick={() => setShowSettings(true)}
-                className="p-2.5 rounded-xl dark:bg-slate-950/40 bg-white/45 hover:bg-slate-200/50 dark:hover:bg-slate-900/60 border border-slate-200 dark:border-slate-850 dark:text-amber-500/90 text-amber-600 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold shadow-sm"
-                title="Configure API keys and rate limits"
-              >
-                <Settings size={15} />
-                <span className="hidden sm:inline">API Settings</span>
-              </button>
+              {/* Configuration is managed via environment variables (.env) */}
             </div>
           </div>
         </header>
@@ -412,26 +379,7 @@ export default function App() {
         {/* Main Workspace */}
         <main className="flex-grow max-w-6xl w-full mx-auto px-4 py-6 sm:py-8 space-y-6">
           
-          {/* API Key Alert */}
-          {!apiKey && !isSharedView && (
-            <div className="p-4 rounded-2xl dark:bg-amber-950/10 bg-amber-500/5 border border-amber-500/20 dark:border-amber-900/30 text-amber-800 dark:text-amber-400 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 select-none">
-              <div className="flex items-start gap-2.5">
-                <AlertTriangle size={16} className="shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-bold uppercase tracking-wider dark:text-amber-300 text-amber-700">API Key Required</h4>
-                  <p className="dark:text-slate-300 text-slate-700 mt-0.5">
-                    An API Key is required to compile release notes. Insert your free **Groq Key** (`gsk_...`) or **Claude Key** under settings. Requests run securely on the client.
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowSettings(true)}
-                className="px-3.5 py-1.5 rounded-lg bg-amber-600/10 hover:bg-amber-600/20 dark:text-amber-300 text-amber-700 border border-amber-500/30 text-[10px] font-bold tracking-wide uppercase transition-all shrink-0 cursor-pointer"
-              >
-                Configure Key
-              </button>
-            </div>
-          )}
+          {/* API Key Warning is handled globally when action is triggered */}
 
           {/* Shared View Info banner */}
           {isSharedView && (
@@ -669,108 +617,7 @@ export default function App() {
           customEndpoint={customEndpoint}
         />
 
-        {/* Settings Modal */}
-        {showSettings && (
-          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 select-none">
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-150">
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-850 p-4 bg-slate-50 dark:bg-slate-950/50">
-                <div className="flex items-center gap-2 text-amber-605 dark:text-amber-400">
-                  <Settings size={18} />
-                  <h3 className="font-bold text-slate-900 dark:text-slate-100 text-xs uppercase tracking-wider">
-                    API & Token Configuration
-                  </h3>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowSettings(false)}
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer text-sm font-bold"
-                >
-                  ✕
-                </button>
-              </div>
-
-              {/* Form */}
-              <form onSubmit={handleSaveSettings} className="p-5 space-y-4">
-                
-                {/* API Key */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 flex items-center justify-between">
-                    <span>API Key (Groq or Claude)</span>
-                    <span className="text-[9px] text-amber-600 dark:text-amber-400 font-mono flex items-center gap-1 font-bold">
-                      <Lock size={10} /> LocalStorage
-                    </span>
-                  </label>
-                  <input
-                    type="password"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    placeholder="Paste gsk_... (Groq) or sk-ant-... (Claude)"
-                    className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 text-slate-800 dark:text-slate-300 placeholder-slate-400 dark:placeholder-slate-700 text-xs focus:border-amber-500 outline-none font-medium"
-                    required
-                  />
-                  <span className="text-[9px] text-slate-500 mt-0.5 leading-normal font-medium">
-                    * Groq keys start with **`gsk_`** and are free. Claude keys start with **`sk-ant-`**.
-                  </span>
-                </div>
-
-                {/* Custom API Endpoint */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                    <span>Custom API Endpoint (CORS Proxy)</span>
-                    <span className="text-[9px] text-slate-500">(Optional)</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={customEndpoint}
-                    onChange={(e) => setCustomEndpoint(e.target.value)}
-                    placeholder="e.g. https://your-cors-proxy.com/messages"
-                    className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 text-slate-800 dark:text-slate-300 placeholder-slate-400 dark:placeholder-slate-750 text-xs focus:border-amber-500 outline-none font-mono"
-                  />
-                  <span className="text-[9px] text-slate-500 mt-0.5">
-                    Bypasses browser CORS headers if calling Anthropic directly.
-                  </span>
-                </div>
-
-                {/* GitHub PAT */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                    <span>GitHub Access Token (PAT)</span>
-                    <span className="text-[9px] text-slate-500">(Optional)</span>
-                  </label>
-                  <input
-                    type="password"
-                    value={githubPat}
-                    onChange={(e) => setGithubPat(e.target.value)}
-                    placeholder="Paste ghp_..."
-                    className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 text-slate-800 dark:text-slate-300 placeholder-slate-400 dark:placeholder-slate-700 text-xs focus:border-amber-500 outline-none font-medium"
-                  />
-                  <span className="text-[9px] text-slate-500 mt-0.5">
-                    Solves rate-limiting errors by increasing limits from 60 to 5000 requests/hr.
-                  </span>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-850">
-                  <button
-                    type="button"
-                    onClick={() => setShowSettings(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-850 text-slate-500 dark:text-slate-400 cursor-pointer transition-colors font-bold"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-black font-bold cursor-pointer transition-colors"
-                  >
-                    Save Settings
-                  </button>
-                </div>
-
-              </form>
-            </div>
-          </div>
-        )}
+        {/* Settings Modal removed as configuration is managed via environment variables (.env) */}
 
         {/* Footer */}
         <footer className="border-t border-slate-200 dark:border-slate-900 py-6 text-center text-[10px] font-bold text-slate-400 dark:text-slate-600 mt-auto select-none uppercase tracking-widest">
