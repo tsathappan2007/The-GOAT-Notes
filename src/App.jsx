@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, RefreshCw, Eye, Share2, ArrowRight, AlertTriangle, Check, Info, GitBranch, FileText, Calendar, BarChart3, LayoutDashboard } from 'lucide-react';
+import { Sparkles, RefreshCw, Eye, Share2, ArrowRight, AlertTriangle, Check, Info, GitBranch, FileText, Calendar, BarChart3, LayoutDashboard, Trophy, Users, GraduationCap, X } from 'lucide-react';
 
 // API & Utilities
 import { fetchRepoData, fetchLatestRelease } from './api/github';
@@ -59,6 +59,7 @@ export default function App() {
   const [customerTone, setCustomerTone] = useState('Balanced');
   const [isSharedView, setIsSharedView] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
 
   // Apply theme class to document body
   useEffect(() => {
@@ -371,7 +372,13 @@ export default function App() {
 
             {/* Right Header Navigation */}
             <div className="flex items-center gap-2">
-              {/* Configuration is managed via environment variables (.env) */}
+              <button
+                onClick={() => setIsAboutOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider dark:bg-slate-900/85 bg-slate-100 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-850 text-slate-800 dark:text-slate-200 cursor-pointer transition-all shadow-sm"
+              >
+                <Trophy size={11} className="text-amber-500 animate-pulse" />
+                <span>About Project</span>
+              </button>
             </div>
           </div>
         </header>
@@ -620,9 +627,129 @@ export default function App() {
         {/* Settings Modal removed as configuration is managed via environment variables (.env) */}
 
         {/* Footer */}
-        <footer className="border-t border-slate-200 dark:border-slate-900 py-6 text-center text-[10px] font-bold text-slate-400 dark:text-slate-600 mt-auto select-none uppercase tracking-widest">
-          THE G.O.A.T. Notes · Compiled Client-Side · Private & Secure
+        <footer className="border-t border-slate-200 dark:border-slate-900 py-8 text-center text-[10px] font-bold text-slate-400 dark:text-slate-600 mt-auto select-none uppercase tracking-widest flex flex-col items-center gap-2">
+          <div>THE G.O.A.T. Notes · Compiled Client-Side · Private & Secure</div>
+          <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-550 normal-case tracking-normal text-[11px] font-medium">
+            <span>Built for the</span>
+            <span className="text-amber-500 font-bold uppercase tracking-wider text-[10px]">Agentic BNB Hackathon</span>
+            <span>(2nd Runner Up) by</span>
+            <button 
+              onClick={() => setIsAboutOpen(true)}
+              className="text-amber-500 hover:text-amber-400 underline font-bold cursor-pointer transition-colors"
+            >
+              CIT IT Sophomores
+            </button>
+          </div>
         </footer>
+
+        {/* About Modal */}
+        {isAboutOpen && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 select-none transition-all duration-300">
+            <div className="bg-slate-950/90 border border-slate-800 dark:border-slate-900 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative border-t-amber-500/45 animate-in fade-in zoom-in-95 duration-200">
+              {/* Close Button */}
+              <button
+                onClick={() => setIsAboutOpen(false)}
+                className="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-900/80 hover:bg-slate-800 p-2 rounded-xl border border-slate-800 transition-all cursor-pointer"
+                aria-label="Close modal"
+              >
+                <X size={16} />
+              </button>
+
+              {/* Trophy Header */}
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-center text-amber-500 shrink-0 shadow-[0_0_15px_rgba(245,158,11,0.15)] animate-pulse">
+                  <Trophy size={24} />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-extrabold text-lg text-white uppercase tracking-wider">THE G.O.A.T. Notes</h3>
+                  <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                    <span className="text-[10px] bg-amber-500/10 border border-amber-500/30 text-amber-500 font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-md">
+                      Second Runner Up
+                    </span>
+                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+                      Agentic BNB Hackathon
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="space-y-4 text-xs text-slate-300 leading-relaxed mb-6 text-left">
+                <p>
+                  THE G.O.A.T. Notes is a premium client-side AI agent designed to automatically synthesize comprehensive release changelogs from repository activity.
+                </p>
+                <p>
+                  Earning the <span className="text-amber-400 font-semibold">Second Runner Up</span> award, this application was built for the <span className="text-slate-100 font-semibold">Agentic BNB Hackathon</span> conducted by the <span className="text-slate-200 font-semibold">Department of Information Technology at Chennai Institute of Technology (CIT)</span>.
+                </p>
+              </div>
+
+              {/* Team Section */}
+              <div className="border-t border-slate-900 pt-5 space-y-4 text-left">
+                <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                  <Users size={12} className="text-amber-500" />
+                  <span>Meet the Developers</span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3">
+                  {/* Sathappan */}
+                  <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900/40 border border-slate-900/80 hover:border-slate-800 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-550 dark:text-amber-400 text-xs font-black">
+                        S
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-200 text-xs">Sathappan T</h4>
+                        <p className="text-[9px] text-slate-500 font-medium uppercase tracking-wider">Sophomore · IT Department</p>
+                      </div>
+                    </div>
+                    <span className="text-[9px] bg-amber-500/10 border border-amber-500/30 text-amber-500 font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-md">
+                      Team Leader
+                    </span>
+                  </div>
+
+                  {/* Suhail Akthar */}
+                  <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900/40 border border-slate-900/80 hover:border-slate-800 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-550 dark:text-amber-400 text-xs font-black">
+                        SA
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-200 text-xs">Suhail Akthar S M</h4>
+                        <p className="text-[9px] text-slate-500 font-medium uppercase tracking-wider">Sophomore · IT Department</p>
+                      </div>
+                    </div>
+                    <span className="text-[9px] bg-slate-850 border border-slate-800 text-slate-400 font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-md">
+                      Teammate
+                    </span>
+                  </div>
+
+                  {/* Hariharan */}
+                  <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900/40 border border-slate-900/80 hover:border-slate-800 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-550 dark:text-amber-400 text-xs font-black">
+                        H
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-200 text-xs">Hariharan R</h4>
+                        <p className="text-[9px] text-slate-500 font-medium uppercase tracking-wider">Sophomore · IT Department</p>
+                      </div>
+                    </div>
+                    <span className="text-[9px] bg-slate-850 border border-slate-800 text-slate-400 font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-md">
+                      Teammate
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* CIT Affiliation Footer */}
+              <div className="mt-6 flex items-center justify-center gap-2 text-[9px] text-slate-500 font-bold uppercase tracking-widest border-t border-slate-900 pt-4">
+                <GraduationCap size={12} className="text-amber-500" />
+                <span>Chennai Institute of Technology</span>
+              </div>
+
+            </div>
+          </div>
+        )}
 
       </div>
     </div>
